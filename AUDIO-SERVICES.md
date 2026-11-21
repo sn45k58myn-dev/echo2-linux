@@ -11,7 +11,11 @@ The optional audio package runs in the project's Alpine ARMv7 userspace. A gener
 
 ## Start the test room
 
-Use the Alpine ARMv7 netboot archive and extracted kernel listed in the [base build guide](README.md). Choose the host's Wi-Fi or Ethernet address for the phone. Prepare a private directory containing a trusted TLS certificate chain in `server.crt`, its matching `server.key` and a temporary room passphrase in `password`. The certificate must cover the exact IP address or DNS name used in Safari. Keep these files outside source control. Only the server's leaf key is needed.
+Use the Alpine ARMv7 netboot archive and extracted kernel listed in the [base build guide](README.md). Choose the host's Wi-Fi or Ethernet address for the phone. Set `TEST_KEYS` to a private directory outside source control. Place the trusted TLS certificate chain in `server.crt` and its matching leaf key in `server.key`. The certificate must cover the exact IP address or DNS name used in Safari. Set a temporary room passphrase of 12–256 bytes in `password`. For a fresh test room, this creates a random passphrase file readable only by its owner.
+
+```sh
+(umask 077 && set -C && openssl rand -hex 24 > "${TEST_KEYS:?choose a private test directory}/password")
+```
 
 ```sh
 python3 tools/run-audio-bench.py \
@@ -21,7 +25,7 @@ python3 tools/run-audio-bench.py \
 
 On home Wi-Fi, open `https://<bench-address>:9443/intercom` in Safari. Sign in, tap **Call room**, allow the microphone and listen for the low tone. Say a word and pause. Two higher tones mean the guest received the phone's audio and sent its reply back through the call. Tap **End call**. The virtual room has no access to a household microphone. It keeps packet and level measurements in RAM.
 
-To exercise music on the same running guest, install the pinned server's dependencies and run the following from the host. The component guide identifies the server archive and its checksum. The receiver's loopback port is published only on the Docker host. Its virtual output reports decoded sample counts and peaks in the container log.
+To exercise music on the same running guest, use the Python test environment and `SERVER_ARCHIVE` from the [Sendspin setup](services/sendspin/README.md#test-a-stream). Run the following from the Docker host. The virtual output reports decoded sample counts and peaks in the container log.
 
 ```sh
 python3 tests/sendspin-stream.py --archive "$SERVER_ARCHIVE" --url ws://127.0.0.1:18928/sendspin

@@ -9,11 +9,32 @@
 
 ## Build
 
-Run the build on Linux with Python 3.12 or later, Git, CMake, Make, a host C/C++20 compiler, and an ARMv7 hard-float GCC/G++ cross toolchain with static glibc and libstdc++. The archive extractor also works with Python 3.11 maintenance releases that support the `data` filter. Export the pinned source checkouts first. Supply the licence notices from the cross toolchain you are actually using.
+Run the build commands from the project root on Linux with Python 3.12 or later, Git, CMake, Make, a host C/C++20 compiler, and an ARMv7 hard-float GCC/G++ cross toolchain with static glibc and libstdc++. The archive extractor also works with Python 3.11 maintenance releases that support the `data` filter. To fetch just the three public revisions used by this build, read their URLs and commit IDs from the [release manifest](../../compat/audio-0.16.8.json).
 
 ```sh
+python3 - <<'PY'
+import json
+from pathlib import Path
+import subprocess
+
+sources = json.loads(Path("compat/audio-0.16.8.json").read_text())["sources"]
+for name, source in sources.items():
+    repo = Path("build/upstream") / (name + ".git")
+    repo.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["git", "init", "--bare", "-q", str(repo)], check=True)
+    subprocess.run(["git", "-C", str(repo), "fetch", "--no-tags", "--depth=1",
+                    source["repository"], source["commit"] + ":refs/tags/audio-0.16.8"], check=True)
+PY
+PRODUCT=build/upstream/product.git
+UI=build/upstream/ui.git
+PLATFORM=build/upstream/platform.git
 python3 tools/export-audio-sources.py --product "$PRODUCT" --ui "$UI" --platform "$PLATFORM" --output build/compat-complete
 python3 tools/export-audio-sources.py --product "$PRODUCT" --ui "$UI" --platform "$PLATFORM" --output build/compat-complete --verify
+```
+
+Set `TOOLCHAIN_NOTICES` to the directory containing the runtime notices described below, then build the player.
+
+```sh
 python3 tools/build-sendspin.py --runtime-notices "$TOOLCHAIN_NOTICES" --output dist/sendspin
 (cd dist/sendspin && sha256sum -c SHA256SUMS)
 ```
@@ -22,9 +43,13 @@ python3 tools/build-sendspin.py --runtime-notices "$TOOLCHAIN_NOTICES" --output 
 
 ## Test a stream
 
-Use a Linux host with ARM binfmt support or native ARMv7, a local test network with one non-loopback network interface, and the Python dependencies declared by the pinned `aiosendspin` server, including its audio codec extras. In a private network namespace the following command exercises pairing, real WebSocket transport, FLAC decoding and timed rendering using the ARM executables.
+Use a Linux host with ARM binfmt support or native ARMv7 and a private test network with one non-loopback interface. The online build downloads the pinned server archive to the path below. For an offline build, set `SERVER_ARCHIVE` to the same tarball in your archive directory. Install the server and its FLAC dependencies in a Python 3.12+ environment before running the tests.
 
 ```sh
+SERVER_ARCHIVE="$PWD/build/downloads/sendspin/83209af414e1950dbbd0ebf60a9c0567b2c5f0c8.tar.gz"
+python3 -m venv build/sendspin-test-venv
+. build/sendspin-test-venv/bin/activate
+python -m pip install "${SERVER_ARCHIVE}[server]"
 python3 tests/sendspin-bench.py --bin dist/sendspin/bin --archive "$SERVER_ARCHIVE"
 ```
 
