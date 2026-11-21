@@ -28,3 +28,19 @@ Linux zlib and Windows zlib-ng produced different gzip streams for the small bas
 - Five audio compatibility checks ran on Alpine ARMv7 under emulation. The original echo canceller reduced a synthetic 20 ms echo by 36.1 dB in its fixture. In a separate integration check, the playback and capture components exchanged 2,880 stereo frames over a Unix socket, produced the expected 960 mono reference samples and handled a receiver disconnect. These numbers describe software tests. The new system still needs an acoustic iPhone call test on hardware.
 
 See the [build guide](README.md) for the commands and the staged hardware plan.
+
+## Physical speaker, array and mute baseline
+
+The test unit ran confirmed LibreEcho 0.16.8. The operator heard two short chimes. The physical microphone button changed the privacy latch from 0 to 1 and back to 0. While muted, the new meter refused to open the capture device. The original ALSA capture stream still reported running while muted, so this observation establishes the latch and diagnostic behaviour only.
+
+With the latch open, the project player fed a 1.25-second synthetic tone into the resident speaker engine. The ARMv7 project meter read the seven active microphone lanes directly from PCM24, retained energy sums and printed levels. Neither room audio nor a recording was saved. Both two-second windows used the same capture path.
+
+| RMS in signed 16-bit units | Mic 0 | Mic 1 | Mic 2 | Mic 3 | Mic 4 | Mic 5 | Mic 6 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Quiet | 35.2 | 32.7 | 32.5 | 31.6 | 31.0 | 31.8 | 31.8 |
+| Tone window | 213.1 | 160.3 | 138.5 | 127.2 | 146.0 | 192.9 | 177.7 |
+| Rise in dB | 15.6 | 13.8 | 12.6 | 12.1 | 13.5 | 15.7 | 14.9 |
+
+The speaker's boot control reported `fixed-a`: both logical slots select the same physical boot image. The running kernel and separate installed recovery kernel both have `CONFIG_KEXEC` disabled. No verified temporary kernel boot was available over the connected network transport. The boot and recovery images matched their preflight hashes after testing. The voice integration reported ready and connected, and the physical mic was left unmuted.
+
+Use [live-audio-baseline.py](tests/live-audio-baseline.py) for the cue check or with `--write-pilot pilot.pcm` to generate the fixed tone offline. The [lane test](tests/live-array-baseline.sh) takes a temporary device directory containing that tone, the project player as `player` and the [ARM mic meter](tests/radar-mic-check.c) as `meter`. It briefly pauses and restores the active voice services and uses the existing board routing. Runs on the independent kernel still require separate validation.

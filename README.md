@@ -2,7 +2,7 @@
 
 An independent Linux system under development for the **full-size Amazon Echo (2nd generation, 2017)**, board `radar_puffin`, MediaTek MT8163. This repository builds an Alpine boot filesystem, a board kernel and device tree, a PCM audio player and an optional voice service. Building the base requires no LibreEcho firmware image or previous release archive.
 
-The base has booted in an emulated ARM machine. The physical Echo has run the new Alpine userspace and audio renderer with its existing kernel. A fresh hardware boot, physical audio playback, Wi-Fi setup and daily-use voice services are still open. The outputs here are development components. There is no flash installer or signed upgrade.
+The base has booted in an emulated ARM machine. Under the existing 0.16.8 kernel and mixer, a physical Echo played a test signal from the project renderer. The project meter detected it on all seven mic channels and blocked capture while the hardware mute was engaged. A physical boot of the independent kernel and validation of its own audio routing, Wi-Fi and voice services are still open. [Hardware results](VALIDATION.md)
 
 ## What we reuse
 
