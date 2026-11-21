@@ -1,0 +1,3 @@
+This experimental intercom gateway builds on the 0.16.8 foreground iPhone intercom in LibreEcho-UI (LibreEcho contributors, MIT). The AudioWorklet is reproduced from commit 984ebc22cf68f1900e931d1129357db91951ea06. The call client is adapted from the same revision and retains its capture, buffering and foreground lifecycle logic. See LICENSE.upstream and https://github.com/sn45k58myn-dev/LibreEcho-UI/tree/984ebc22cf68f1900e931d1129357db91951ea06.
+
+The Linux gateway uses Gorilla WebSocket (BSD 2-Clause, see LICENSE.websocket) and the Go standard library and runtime (BSD-style, included with the binary bundle). Gateway, probe, FIFO adapter and integration tests were developed with AI assistance.

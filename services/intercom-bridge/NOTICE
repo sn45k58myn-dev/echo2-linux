@@ -1,0 +1,5 @@
+The room companion libreecho-intercomd is compiled from LibreEcho-UI 0.16.8 public source, commit 984ebc22cf68f1900e931d1129357db91951ea06, copyright LibreEcho contributors. It implements the LEIC1/READY local room interface, Assist hold, room policy checks, room indication, indexed microphone stream and system PCM mixer output. See the bundled MIT licence and https://github.com/sn45k58myn-dev/LibreEcho-UI/tree/984ebc22cf68f1900e931d1129357db91951ea06.
+
+The optional FIFO adapter was written for Echo 2 Linux with AI assistance. Both static Linux executables include the musl C library under the licensing terms distributed with the compiler target.
+
+GCC runtime portions are distributed with the GCC Runtime Library Exception 3.1 and the GNU General Public License 3. The original texts are included as COPYING.RUNTIME and COPYING3.

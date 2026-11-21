@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Room intercom</title><link rel="stylesheet" href="/style.css"><script defer src="/js/intercom-ui.js"></script><script defer src="/js/app.js"></script></head>
+<body><main><form class="signout" method="post" action="/logout"><button>Sign out</button></form>
+<h1 id="room-title">Room intercom</h1><p id="instructions">Keep this page open during the call.</p>
+<button id="intercom-start" class="primary" type="button" disabled>Call room</button>
+<button id="intercom-mute" type="button" disabled>Mute my microphone</button>
+<button id="intercom-end" type="button" disabled>End call</button>
+<p id="intercom-status" role="status" aria-live="polite">Ready to call.</p>
+<small id="levels"></small></main></body></html>

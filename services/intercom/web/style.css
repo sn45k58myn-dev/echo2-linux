@@ -1,0 +1,14 @@
+:root {font:17px/1.5 "Source Sans 3",system-ui,sans-serif;color:#172a2c;background:#eef3ef}
+* {box-sizing:border-box}
+body {margin:0;padding:clamp(1rem,8vw,5rem) 1rem}
+main {background:#fff;padding:clamp(1.25rem,5vw,2.5rem);max-width:31rem;margin:auto;border-radius:1rem}
+h1 {font-size:clamp(1.7rem,5vw,2.25rem);line-height:1.12;margin:.4rem 0 1rem}
+p {max-width:38ch}
+button,input {font:inherit;border:1px solid #8b9e99;padding:.6rem .9rem;border-radius:.45rem}
+button {margin:.3rem .2rem .3rem 0;cursor:pointer;background:#fff;color:#193d37}
+button.primary {background:#165c49;color:white;border-color:#165c49}
+button:disabled {opacity:.5;cursor:default}
+input,label {display:block;width:100%;margin-bottom:.4rem}
+.signout {text-align:right}
+.signout button {font-size:.85rem}
+small {color:#49615a}

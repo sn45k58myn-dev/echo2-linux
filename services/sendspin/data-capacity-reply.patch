@@ -1,0 +1,22 @@
+--- a/src/adapter/sendspin/engine_sink.cpp
++++ b/src/adapter/sendspin/engine_sink.cpp
+@@ -879,6 +879,19 @@
+             return r;
+         }
+         if (type == LE_AUDIO_SINK_TYPE_ERROR) {
++            if (len == LE_AUDIO_SINK_ERROR_PAYLOAD_BYTES && pending_frames_ && !pending_ready_ &&
++                le_audio_sink_get_u32(pl) == LE_AUDIO_SINK_ERR_CAPACITY &&
++                le_audio_sink_get_u32(pl + 4) == epoch_ &&
++                le_audio_sink_get_u32(pl + 8) == generation_ &&
++                le_audio_sink_get_u32(pl + 12) == LE_AUDIO_SINK_TYPE_DATA) {
++                // The DATA deadline elapsed before the full queue rejected the
++                // offer. Its reply belongs to the writer; no PCM was accepted.
++                // Keep the PROGRESS request in flight and read its own reply.
++                pending_frames_ = 0;
++                capacity_bound_ = 0;
++                capacity_bound_known_ = true;
++                continue;
++            }
+             if (len >= 4) last_error_ = le_audio_sink_get_u32(pl);
+             last_result_ = SinkResult::Rejected;
+             if (engine_dropped_generation(last_error_)) lose_stream_locked();

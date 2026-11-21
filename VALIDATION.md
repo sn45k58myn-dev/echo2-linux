@@ -44,3 +44,28 @@ With the latch open, the project player fed a 1.25-second synthetic tone into th
 The speaker's boot control reported `fixed-a`: both logical slots select the same physical boot image. The running kernel and separate installed recovery kernel both have `CONFIG_KEXEC` disabled. No verified temporary kernel boot was available over the connected network transport. The boot and recovery images matched their preflight hashes after testing. The voice integration reported ready and connected, and the physical mic was left unmuted.
 
 Use [live-audio-baseline.py](tests/live-audio-baseline.py) for the cue check or with `--write-pilot pilot.pcm` to generate the fixed tone offline. The [lane test](tests/live-array-baseline.sh) takes a temporary device directory containing that tone, the project player as `player` and the [ARM mic meter](tests/radar-mic-check.c) as `meter`. It briefly pauses and restores the active voice services and uses the existing board routing. Runs on the independent kernel still require separate validation.
+
+## Independent Linux audio services
+
+The expanded compatibility snapshot contains 203 files. Its receipt SHA-256 is `67b164b60b0d9b2792bf5afe9dc76c45baeb1187e69860ddee9f05332bd50812`. The [audio test room](AUDIO-SERVICES.md) ran the Sendspin receiver and the intercom together in the project's ARMv7 Alpine userspace under QEMU. The guest had no physical audio device or access to the household integrations.
+
+| Test | Observed result |
+| --- | --- |
+| Real iPhone on Wi-Fi | The caller heard the room's 440 Hz tone, spoke and heard the two higher reply tones. The guest counted 425 packets from the phone, 398 back to the phone and one speech-triggered reply. The caller ended the call and the room returned to idle. |
+| Final intercom executable | Only display text changed after the handset candidate. The final ARMv7 build reproduced byte for byte and passed a browser call and a full-guest encrypted round trip. The latter measured 72 packets in each direction, input RMS 4,242 and the expected 440, 660 and 880 Hz tones. |
+| Linux room audio interface | Distinct 16 kHz PCM frames travelled in both directions through the FIFO backend. The test included a partial capture read and verified that changing the privacy state closed an active call. |
+| Native room companion and mixer | Two ARMv7 calls ran through HTTPS/WSS, the gateway, the bridge and the 0.16.8 Linux companion. The synthetic mic returned 85 and 86 exact frames after startup out of 90 per call. The 48 kHz mixer received 83,517 and 84,477 matching stereo sample pairs. The test also exercised a second call, room opt-out, mute and Do Not Disturb denial, and disconnection when the privacy latch closed. |
+| Secure paired Sendspin | A real Sendspin server paired with the ARM receiver and sent six seconds of 48 kHz stereo FLAC. Two runs using the corrected virtual playback clock decoded the 720 Hz pilot at the expected level with no receiver sync losses. |
+| Playback queue recovery | Under load a full sink queue could reject a packet after its write deadline. If the timing poll consumed that rejection, the receiver could stay connected with its playback cursor stuck. A socket test reproduced the stall on the original adapter. The Linux patch lets the writer retry once space opens. The test checks both audio content and the exact accepted frame count. |
+| Paired playback after the fix | The ARM receiver decoded a 24-second encrypted FLAC programme. It rendered 2,281,348 nonzero channel samples at the correct 720 Hz pitch and peak of 2,602. The receiver reported zero sync losses in this run. |
+| Simultaneous music and call on the final system | The server sent a 40-second, 1,920,000-frame stereo FLAC programme. While it rendered, an authenticated intercom call exchanged 72 packets each way and returned all three expected tones. The last virtual output report showed 1,968,016 frames including startup padding, at least 3,746,794 nonzero channel samples and a peak of 2,602. There were no reported sync losses, and the earlier midstream stall did not recur. |
+| Two-player Sendspin group | Both independently paired Linux receivers decoded all five markers in a six-second run of the final queue fix. Each rendered 282,852 nonzero frames. The largest estimated difference between virtual output writes was 2.3 ms. The largest polling bracket was 4.7 ms, and both outputs wrote in 5 ms slices on a shared host. Two earlier runs also decoded every marker. |
+
+This validation used an isolated server and synthetic room audio. Physical multi-room alignment and acoustic echo cancellation on the independent board kernel still need measurements.
+
+Both audio package formats contain the same six ARMv7 executables and their licence notices. The image builder unpacked the SquashFS and checked the inventory, modes and file bytes. The combined initramfs was booted with the project base and served an authenticated call.
+
+| Final local artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `echo2-audio-services.cpio.gz` | 4,699,832 | `26ba4390a45745faa7fa52d9f8f4b8e71a8db4946a3566361f8f213c9343afa4` |
+| `echo2-audio-services.squashfs` | 4,747,264 | `de2752b72959e2b102d46fc15275bbd0db4091122fba65052a5233b28e997f6e` |

@@ -6,7 +6,7 @@ FEATURE := build/echo2-voice.squashfs
 PLAYER := build/echo2-player
 VOICE := dist/voice
 
-.PHONY: base voice feature kernel boot-test feature-test
+.PHONY: base voice feature kernel boot-test feature-test audio-services
 
 base: $(BASE)
 
@@ -21,6 +21,11 @@ voice:
 
 feature: voice
 	$(PYTHON) tools/build-rootfs.py --voice-dir "$(VOICE)" --feature-output "$(FEATURE)" --replace
+
+# The component builders publish checked binaries and notices in dist/. Keep
+# all service assets separate from the board's size-limited boot filesystem.
+audio-services:
+	$(PYTHON) tools/build-audio-feature.py --replace
 
 kernel:
 	@test -n "$(KERNEL_SRC)" || { echo "Set KERNEL_SRC to the pinned board kernel checkout" >&2; exit 2; }
