@@ -1,0 +1,3 @@
+# Early mounts and optional development-console registration are handled by /init.
+::ctrlaltdel:/sbin/reboot
+::shutdown:/bin/sync

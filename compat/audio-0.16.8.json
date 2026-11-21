@@ -1,0 +1,39 @@
+{
+  "release": "0.16.8",
+  "target": "radar_puffin",
+  "description": "Reference sources for porting the Echo 2 Sendspin player and iPhone intercom. Public release records identify the shipped UI and platform trees. The product checkout below is the separate builder tag containing those records. External SDK and library sources are identified by their upstream lock and notices.",
+  "sources": {
+    "product": {
+      "repository": "https://github.com/sn45k58myn-dev/LibreEcho",
+      "commit": "5cc34e5392bc79a5b6f315f0f86d85941cd8476f",
+      "tree": "e72dee401821f45746b109e11a0c8b13ab00f494",
+      "groups": {
+        "release-provenance": ["LICENSE", "ATTRIBUTION.md", "AI_DISCLOSURE.md", "docs/community/echo2-0.16.8.json", "docs/community/0.16.8.md", "docs/architecture/sendspin.md", "docs/audio/sendspin.md", "docs/audio/intercom.md", "release/THIRD_PARTY_NOTICES.md", "release/CORE-RUNTIME-SOURCE-OFFER.md", "release/PUBLIC-AUDIO-SOURCE-CLOSURE.md"]
+      }
+    },
+    "ui": {
+      "repository": "https://github.com/sn45k58myn-dev/LibreEcho-UI",
+      "commit": "984ebc22cf68f1900e931d1129357db91951ea06",
+      "tree": "41b650f94bd108acb2c57e6c073712cf70ce8dd6",
+      "groups": {
+        "licensing": ["LICENSE", "THIRD_PARTY_NOTICES.md"],
+        "sendspin-player": ["src/adapter/sendspind.cpp", "src/adapter/sendspin/CMakeLists.txt", "src/adapter/sendspin/*.cpp", "src/adapter/sendspin/*.h", "src/adapter/airplayd.c", "src/adapter/mdns_client.*", "src/adapter/mdns_lease.*", "src/adapter/mdnsd.c", "init/libreecho-mdnsd.init"],
+        "intercom": ["docs/INTERCOM.md", "docs/INTERCOM_PROTOCOL.md", "docs/MICROPHONE_ARCHITECTURE.md", "src/intercom.*", "src/intercom_protocol.*", "src/adapter/intercomd.c", "init/libreecho-intercomd.init", "web/js/intercom-ui.js", "web/js/intercom-worklet.js"],
+        "audio-and-aec": ["src/adapter/audiod.c", "src/adapter/micd.c", "src/adapter/capture_mux.c", "src/adapter/mic_beamformer.*", "src/adapter/waked.c", "src/adapter/voice_aec.*", "src/adapter/voice_aec_guard.*", "src/adapter/voice_dsp.*", "src/adapter/voice_ns.*", "src/adapter/voice_reference.*", "src/adapter/voice_stream.*", "src/adapter/live_b64.*", "src/adapter/live_audio_out.*", "src/adapter/event_sound.h", "src/adapter/sleep_generator.h", "src/adapter/radio_resample.*", "src/owner_eq.h", "init/libreecho-audiod.init", "init/libreecho-micd.init", "init/libreecho-waked.init"],
+        "host-integration": ["Makefile", "src/api.*", "src/http_server.*", "src/http_config_worker.inc", "src/backend.*", "src/backend_internal.h", "src/backend_linux.c", "src/backend_mock.c", "src/auth.*", "src/peer_auth.*", "src/tls.*", "src/config_store.*", "src/json.*", "src/log.*", "src/adapter/adapter.h", "src/adapter/adapter_client.c", "src/adapter/adapter_server.c", "src/adapter/watchdogd.c", "src/adapter/esphomed.c", "src/adapter/esphome_playback.*", "src/service_env.*", "web/openapi.json", "web/index.html", "web/js/app.js", "web/js/integrations-ui.js"],
+        "regression-tests": ["tests/test_intercom*", "tests/test_waked_intercom_aec.c", "tests/test_voice_aec*", "tests/test_voice_reference.c", "tests/test_sendspin*", "tests/sendspin_engine_fixture.h", "tests/test_mdns_sendspin.py"]
+      }
+    },
+    "platform": {
+      "repository": "https://github.com/sn45k58myn-dev/LibreEcho-Platform",
+      "commit": "160dd390362a1e322c8799b4be0ac3dd21f982a6",
+      "tree": "14023617ec1e06167bd9ee35f7f70db369ad2a92",
+      "groups": {
+        "licensing": ["COPYING"],
+        "sendspin-sdk-and-patches": ["tools/mt8163-arm32/sendspin/README.md", "tools/mt8163-arm32/sendspin/SOURCE.lock", "tools/mt8163-arm32/sendspin/build_sendspin.sh", "tools/mt8163-arm32/sendspin/build_sendspind.sh", "tools/mt8163-arm32/sendspin/patches/*.patch", "tools/mt8163-arm32/sendspin/verify_sendspin_*.py", "tools/mt8163-arm32/sendspin/test_*.py"],
+        "speaker-engine-and-reference": ["tools/mt8163-arm32/airplay/README.md", "tools/mt8163-arm32/airplay/aec_reference.*", "tools/mt8163-arm32/airplay/audio_engine.c", "tools/mt8163-arm32/airplay/audio_*.h", "tools/mt8163-arm32/airplay/audio_sink.c", "tools/mt8163-arm32/airplay/audio_timing.c", "tools/mt8163-arm32/airplay/audio_visualizer.c", "tools/mt8163-arm32/airplay/airplay_delay.h", "tools/mt8163-arm32/airplay/biscuit_speaker_dsp.h", "tools/mt8163-arm32/airplay/playback_status.*", "tools/mt8163-arm32/airplay/puffin_downmix.h", "tools/mt8163-arm32/airplay/speaker_*.h", "tools/mt8163-arm32/airplay/music_*.h", "tools/mt8163-arm32/airplay/music_trace.c"],
+        "regression-tests": ["tools/mt8163-arm32/airplay/test_aec_reference.*", "tools/mt8163-arm32/airplay/test_audio_engine_sendspin.py", "tools/mt8163-arm32/airplay/test_audio_sink.py", "tools/mt8163-arm32/airplay/test_audio_timing.py"]
+      }
+    }
+  }
+}

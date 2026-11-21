@@ -1,0 +1,12 @@
+# Optional Echo 2 voice satellite
+
+This candidate uses the TECHO5 Go daemon developed from Yuri Gelfand's EchoLocal. It uses the upstream `dot` build tag, which includes the full-size Echo 2 (Radar) hardware profile. Its hardware detection on Linux 6.1 reads the Echo's board identity from the device tree when the vendor IDME interface is unavailable. [Upstream board detection](https://github.com/HuskerMinion/techo5/blob/3907d43be77f94c075c0ff72826cfc52ac1b0f94/echod/internal/layout/device_dot.go) · [Upstream Echo 2 hardware notes](https://github.com/HuskerMinion/techo5-dot/blob/4841b75c80b36d7e3221860be1175804ef77e579/docs/hardware-radar.md)
+
+From the project root, run `python3 tools/build-voice.py` with Python 3.11 or newer and Docker configured for Linux containers. This downloads the pinned source archive, checks its SHA-256, verifies Go modules against the upstream lock file, and cross-compiles a static Linux ARMv7 executable with the pinned Go toolchain. For a repeat build, choose a fresh directory with `--output`. You can supply the same verified archive with `--source-archive`.
+
+The result is `dist/voice/techo5-echod`. The adjacent `licenses/` directory contains the project, daemon, embedded audio and linked dependency notices. Keep that directory with any copy of the executable. The upstream project and daemon notices below include information about other TECHO5 distributions and assets. This recipe builds the Go executable from source and includes no vendor firmware, personal wake models or recovery tools.
+
+Run `python3 tools/build-voice.py --inspect` on the build computer to verify the executable against the tested checksum and read its identity without starting it. The upstream program probes hardware during Go package initialization, including when called with `--version` or `--help`. Those flags were tested under ARM emulation with read-only system paths and no hardware devices. A bare invocation starts its services. The candidate ships without an automatic startup entry. Live use requires validating the Radar mixer, physical microphone mute, compatible wake models, device permissions, Linux paths, network setup and Home Assistant pairing. The package supplies no selected personal wake word. Sharing hardware already owned by another audio service requires additional integration.
+
+- [TECHO5 license](TECHO5-LICENSE) and [component notices](TECHO5-NOTICE)
+- [EchoLocal daemon license](EchoLocal-LICENSE) and [daemon attribution](echod-NOTICE)

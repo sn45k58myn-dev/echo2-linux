@@ -1,0 +1,17 @@
+#!/bin/sh
+# Early userspace on a RAM root. All state created by this init is volatile.
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin
+mount -t proc proc /proc || exit 1
+mount -t sysfs sysfs /sys || exit 1
+mount -t devtmpfs devtmpfs /dev || exit 1
+mkdir -p /dev/pts /run
+mount -t devpts devpts /dev/pts || exit 1
+mount -t tmpfs -o mode=0755,nosuid,nodev tmpfs /run || exit 1
+echo 'Echo 2 Linux userspace ready'
+case " $(cat /proc/cmdline) " in
+    *" echo2.console=1 "*)
+        echo 'Development console enabled'
+        echo '::askfirst:-/bin/sh' >> /etc/inittab
+        ;;
+esac
+exec /sbin/init
