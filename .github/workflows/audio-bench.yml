@@ -9,6 +9,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm
+      - run: python3 tools/build-player.py
       - run: python3 -m unittest discover -s tests
       - run: docker build -t echo2-paired-check tools/factory-asr-bench/paired
       - run: docker run --rm --network none echo2-paired-check

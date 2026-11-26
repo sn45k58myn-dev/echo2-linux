@@ -93,9 +93,10 @@ Two fresh guest runs of the quietest synchronized fixture gave unprocessed wake 
 
 ## Run the paired audio regression from a fresh checkout
 
-Run these commands from the repository root with Linux containers enabled. The tests generate the microphone, playback and detector signals locally.
+Run these commands from the repository root on Linux with Git, Python 3.11 or newer, Docker and ARMv7 execution support. On x86 hosts the full suite uses QEMU binfmt for the ARM player. The tests generate the microphone, playback and detector signals locally.
 
 ```sh
+python3 tools/build-player.py
 python3 -m unittest discover -s tests
 docker build -t echo2-paired-check tools/factory-asr-bench/paired
 docker run --rm --network none echo2-paired-check
