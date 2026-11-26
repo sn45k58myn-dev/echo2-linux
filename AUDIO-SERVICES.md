@@ -38,4 +38,37 @@ For a group test, use `python3 tests/sendspin-group.py --archive "$SERVER_ARCHIV
 
 ## Hardware qualification
 
+### Wake word on the speech output
+
+The [factory audio bench](tools/factory-asr-bench/README.md) connects the original Echo 2 speech processor to the independent detector on a development computer. Supply the stock files from a private backup.
+
+The host-side wake bench accepts the mono speech signal at the output of a microphone front end. The full-size Echo 2 factory ASR configuration examined produces signed 16-bit PCM at 16 kHz. Supply it to the bench as headerless little-endian samples. A 128-sample frame is 256 bytes. The bench combines ten frames per 80 ms inference window and accepts fragmented reads. A WAV fixture with the same audio format can also be used. The command reads audio from the supplied stream or file and emits JSON lines containing timing and scores.
+
+Install NumPy and ONNX Runtime in a Python environment on the test host. Supply the openWakeWord `melspectrogram.onnx` and `embedding_model.onnx` from the matching feature model set, plus a binary classifier with a 16-by-96 feature input. These model files and test recordings are supplied locally. Run from the project root.
+
+```sh
+python -m pip install numpy onnxruntime
+python tools/asr-wake-bench.py --features "$WAKE_FEATURE_DIR" --model "$WAKE_MODEL" < speech.s16le
+python tools/asr-wake-bench.py --features "$WAKE_FEATURE_DIR" --model "$WAKE_MODEL" --wav phrase.wav
+python tools/asr-wake-bench.py --features "$WAKE_FEATURE_DIR" --model "$WAKE_MODEL" --factory-pcm < factory-asr.s16le
+```
+
+For NS6571 factory ASR output, pass `--factory-pcm` with either stdin or `--wav`. The factory reports an enabled metadata encoder. Two independent guest runs using identical microphone input differed only in bit 0 of their mono output samples. This mode clears that bit before extracting speech features. Use the default mode for standard WAV recordings and raw microphone lanes.
+
+The first 400 ms establish the live feature history. A `wake` line marks the end of the first qualifying 80 ms window. The default decision threshold is 0.5 and distinct events have a 1.75 s minimum spacing. The end-of-stream summary includes the peak score, count of wakes and any unscored final partial block. Supply some real trailing audio in a phrase fixture so the recognizer can see the end of the word. The bench makes no network calls and saves no PCM. It does not enable a room microphone or start a voice assistant.
+
+To repeat the model checks, set `WAKE_FEATURE_DIR` and `WAKE_MODEL`, point `WAKE_PHRASE_WAV` at a mono 16 kHz fixture containing one expected wake and `WAKE_CONTROL_WAV` at unrelated speech, then run `python tests/test_asr_wake_bench.py -v`. That test compares normal, raw and irregularly fragmented input and checks silence.
+
+In a local run using the “Okay Groot” classifier, the clean transmitted phrase “Okay Groot, stop music” scored 0.97019 and triggered once at 2.08 s. “Stop music” alone scored 0.00084 and silence scored 0.00070. All three peak scores matched the independent native reference within 0.000001.
+
+A separate ARM guest ran the factory NS6571 speech front end on synthetic multichannel microphone input. The same classifier and 0.5 threshold were used on a raw microphone lane and on the processed speech output. Each detected the word once in clean speech and once during simulated music. Neither detected a wake on music alone or on the unrelated command with music. The factory-output detection arrived one 80 ms inference window later in clean speech and two windows later during music.
+
+Lowering only the speech in that same mix by 12 dB still triggered both paths. With speech lowered by 24 dB, the raw lane triggered at 0.920. The reference reader initially had no digital loopback. In a follow-up run, channels 7 and 8 carried stereo samples from the factory speaker output, downsampled to 16 kHz and delayed by 8 ms. The factory reader reported synchronization on the mixed, quietest and music-only runs.
+
+Passing the untouched factory output straight to the classifier missed the quietest synchronized trial at 0.359. With `--factory-pcm`, two independent runs on the same fixture gave identical speech samples and detected the wake at a peak of 0.528, just above the fixed threshold. The raw microphone lane gave the stronger score in this case.
+
+A second synthesized voice (Microsoft Zira) was then tested with the same music, microphone geometry, classifier and threshold. In quiet its raw score was 0.107 and its factory score was 0.480 before removing metadata. After removing metadata the factory score was 0.945, which triggered a wake. At the initial music level both the raw and corrected factory paths triggered (0.633 and 0.966). With the second voice lowered by 24 dB, both paths missed. These measurements cover two synthesized voices in one simulated scene. See the [calibrated microphone trial](VALIDATION.md#calibrated-microphone-trial) for the first physical comparison during playback.
+
+### Board audio
+
 The synthetic room and virtual audio output make transport failures distinguishable from microphone, amplifier and acoustic problems. The physical speaker still needs its board audio routing, capture and mute inputs validated under the project's kernel. An acoustic call and a measured two-player test are needed to qualify echo cancellation and multi-room sync. [Validation record](VALIDATION.md)

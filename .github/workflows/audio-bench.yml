@@ -1,0 +1,15 @@
+name: Audio bench
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  synthetic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s tests
+      - run: docker build -t echo2-paired-check tools/factory-asr-bench/paired
+      - run: docker run --rm --network none echo2-paired-check
+      - run: docker run --rm --network none -e ROUTER_TEST_ALIGNMENT_LOSS=1 echo2-paired-check

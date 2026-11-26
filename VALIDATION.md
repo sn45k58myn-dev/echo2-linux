@@ -69,3 +69,21 @@ Both audio package formats contain the same six ARMv7 executables and their lice
 | --- | ---: | --- |
 | `echo2-audio-services.cpio.gz` | 4,699,832 | `26ba4390a45745faa7fa52d9f8f4b8e71a8db4946a3566361f8f213c9343afa4` |
 | `echo2-audio-services.squashfs` | 4,747,264 | `de2752b72959e2b102d46fc15275bbd0db4091122fba65052a5233b28e997f6e` |
+
+## Calibrated microphone trial
+
+One full-size Echo 2 on LibreEcho 0.16.8 loaded all seven of its own microphone calibration values. During a 56-second RAM-only trial with native Sendspin at 30%, the factory processor supplied microphone audio to Home Assistant. The operator confirmed that the speaker answered one spoken time request. Both local comparison paths crossed the 0.5 wake threshold in the same 80 ms scoring block. The normal path peaked at 0.941 and the factory path at 0.965. One spoken request cannot establish a change in detection rate.
+
+The Assist FIFO accepted 7,000 blocks. It reported zero writes dropped for backpressure and zero unavailable writes. The installed voice services were verified after restoration. The spoken trial retained only timings, scores and counts.
+
+### Gates for a production image
+
+| Evidence still needed | Acceptance check |
+| --- | --- |
+| Recoverable boot on the independent kernel | Boot a test image on a recovery-connected Radar and demonstrate return to the known-good image. |
+| Physical privacy and audio routing | Verify power cycling, physical mute across every capture path, Wi-Fi loss, intercom interruption, Sendspin sync and two-way calls on that kernel. |
+| Wake performance over music | Compare multiple people, distances and playback levels against the same baseline. Count missed commands and false wakes during music-only intervals. |
+| Offline operation and distribution | Verify network isolation for optional owner-supplied components. Establish redistribution rights or ship an independent replacement. |
+| Upgrade and recovery | Verify signed upgrades, interrupted-update recovery and rollback on hardware, then repeat the tests from a clean install. |
+
+[Reproduce the audio tests](tools/factory-asr-bench/README.md#run-the-paired-audio-regression-from-a-fresh-checkout)

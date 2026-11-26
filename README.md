@@ -69,3 +69,7 @@ On Alpine with `gcc`, `musl-dev` and `speexdsp-dev` installed, run `sh tests/com
 ## Credits and hardware use
 
 Credit belongs to the Alpine, BusyBox, Linux, TinyALSA, LibreEcho, TECHO5, EchoLocal and Sendspin contributors and to the authors of the dependencies named in the component notices. Original licence and source-offer terms apply to their respective components. This development work was prepared with AI assistance. Experimental software is provided without a hardware warranty or a promise of repair or recovery. [Build and hardware validation](VALIDATION.md)
+
+### Microphone development
+
+The [calibrated microphone bench](tools/factory-asr-bench/README.md#run-the-paired-audio-regression-from-a-fresh-checkout) includes a synthetic Assist routing test that runs from a clean checkout. The optional native worker uses owner-supplied DSP files. See the [physical trial and release gates](VALIDATION.md#calibrated-microphone-trial) for the results and remaining hardware work.
